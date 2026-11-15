@@ -6,8 +6,8 @@
 //  Enquanto estiverem vazias, o site abre em MODO DEMONSTRAÇÃO.
 // =====================================================================
 window.SITE_CONFIG = {
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  supabaseUrl: "https://ciwcqsngxeqikaqkivlg.supabase.co",
+  supabaseAnonKey: "sb_publishable_VGBqUMa41VTnXLMQ0zo3_A_ynop2Z_v", // chave publishable (pública)
 
   marca: { a: "Gaúcha", b: "Impressoras" },
 

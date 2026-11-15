@@ -20,7 +20,7 @@ Mesma base do [blackwhite-site](https://github.com/Dravanz/blackwhite-site): HTM
 |---|---|---|
 | Site (HTML/CSS/JS estático) | GitHub Pages | grátis |
 | Banco, login (Google) e imagens | Supabase (plano Free) | grátis |
-| E-mail automático (opcional) | Supabase Edge Function + Resend | grátis até 3.000 e-mails/mês |
+| E-mail automático (opcional) | Supabase Edge Function + Gmail (ou Resend com domínio) | grátis |
 
 ### Fluxo de uma locação
 
@@ -68,6 +68,7 @@ js/vendor/supabase.js
 img/logo*.svg|png   img/impressoras/*.svg (ilustrações de exemplo)
 supabase/schema.sql          ← tabelas, regras de segurança, funções e bucket
 supabase/seed-exemplo.sql    ← impressoras de exemplo (opcional)
-supabase/functions/notificar ← e-mail automático (opcional)
+supabase/functions/notificar ← e-mail automático pelo Gmail (opcional)
+supabase/webhooks.sql        ← liga a função nas tabelas
 .github/workflows/supabase-keepalive.yml
 ```

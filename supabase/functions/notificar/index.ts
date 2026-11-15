@@ -1,26 +1,49 @@
 // =====================================================================
-//  OPCIONAL · Aviso automático por e-mail (Supabase Edge Function + Resend)
-//  Disparada por um Database Webhook nas tabelas "reservas" e "chamados":
+//  OPCIONAL · Aviso automático por e-mail (Supabase Edge Function)
+//  Disparada pelas tabelas "reservas" e "chamados" (supabase/webhooks.sql):
 //   - novo pedido de locação  -> e-mail para o dono
 //   - pedido aprovado/recusado/cancelado -> e-mail para o cliente (se informou)
 //   - novo chamado de manutenção -> e-mail para o dono
-//  Variáveis (Edge Functions > Secrets): RESEND_API_KEY, EMAIL_DONO,
-//  EMAIL_REMETENTE (ex.: "Gaúcha Impressoras <avisos@seudominio.com.br>"),
-//  WEBHOOK_SECRET (o mesmo valor colocado no cabeçalho x-webhook-secret do webhook).
-//  Veja o passo a passo em SETUP.md.
+//
+//  Envio pelo GMAIL da Gaúcha (grátis, sem domínio próprio). Secrets:
+//    GMAIL_USUARIO   ex.: gauchaimpressoras@gmail.com
+//    GMAIL_SENHA_APP senha de app de 16 letras (Conta Google > Segurança >
+//                    Verificação em duas etapas > Senhas de app)
+//    EMAIL_DONO      e-mail que recebe os avisos (pode ser o mesmo Gmail)
+//    WEBHOOK_SECRET  mesmo valor usado em supabase/webhooks.sql
+//  Alternativa (domínio próprio verificado no Resend): sem os secrets do Gmail,
+//  usa RESEND_API_KEY + EMAIL_REMETENTE ("Gaúcha Impressoras <avisos@dominio.com.br>").
 // =====================================================================
+import nodemailer from "npm:nodemailer@6.9.16";
+
 const env = (k: string) => Deno.env.get(k) ?? "";
 const brl = (n: number) => Number(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const br = (s: string) => s.split("-").reverse().join("/");
 const esc = (s: unknown) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
 
+let smtp: ReturnType<typeof nodemailer.createTransport> | null = null;
+
 async function enviar(to: string, subject: string, linhas: string[]) {
   const html = `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#15171b">
     <h2 style="color:#169b5b;margin:0 0 12px">Gaúcha Impressoras</h2>${linhas.map((l) => `<p style="margin:0 0 6px">${esc(l)}</p>`).join("")}</div>`;
+  const text = linhas.join("\n");
+
+  if (env("GMAIL_USUARIO") && env("GMAIL_SENHA_APP")) {
+    smtp ??= nodemailer.createTransport({
+      host: "smtp.gmail.com", port: 465, secure: true,
+      auth: { user: env("GMAIL_USUARIO"), pass: env("GMAIL_SENHA_APP").replace(/\s/g, "") },
+    });
+    try {
+      const info = await smtp.sendMail({ from: `"Gaúcha Impressoras" <${env("GMAIL_USUARIO")}>`, to, subject, text, html });
+      console.log("Gmail enviado", to, info.messageId);
+    } catch (e) { console.error("Gmail erro", to, String(e)); }
+    return;
+  }
+
   const r = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${env("RESEND_API_KEY")}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: env("EMAIL_REMETENTE") || "Gaúcha Impressoras <onboarding@resend.dev>", to: [to], subject, html, text: linhas.join("\n") }),
+    body: JSON.stringify({ from: env("EMAIL_REMETENTE") || "Gaúcha Impressoras <onboarding@resend.dev>", to: [to], subject, html, text }),
   });
   if (!r.ok) console.error("Resend", r.status, await r.text());
 }

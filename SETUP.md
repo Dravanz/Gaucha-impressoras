@@ -55,14 +55,17 @@ Depois atualize **Site URL** e **Redirect URLs** no Supabase e os links do `404.
 Sem isso tudo funciona: o dono é avisado pelo WhatsApp do cliente e avisa o cliente com um toque no painel.
 Com isso, os e-mails saem sozinhos (novo pedido → dono; aprovado/recusado/cancelado → cliente; nova manutenção → dono).
 
-1. Crie uma conta grátis em <https://resend.com> e gere uma **API Key**.
-   Para mandar e-mail para qualquer cliente é preciso verificar um domínio próprio em *Domains*
-   (sem domínio, o Resend só entrega no e-mail da própria conta, o que já serve para avisar o dono).
+Os e-mails saem pelo **Gmail da Gaúcha** (grátis, até ~500 por dia, sem precisar de domínio).
+
+1. Na Conta Google do Gmail que vai enviar: *Segurança → Verificação em duas etapas* (ative, se ainda não estiver)
+   → no fim da página, **Senhas de app** (ou acesse <https://myaccount.google.com/apppasswords>) → crie uma chamada "Site Gaúcha" e copie a senha de 16 letras.
 2. No Supabase: *Edge Functions → Deploy a new function → Via Editor*, nome `notificar`,
-   cole o conteúdo de `supabase/functions/notificar/index.ts` e faça o deploy.
-   Em *Details*, desligue **Verify JWT** (a função confere um segredo próprio).
-3. *Edge Functions → Secrets*: crie `RESEND_API_KEY`, `EMAIL_DONO` (e-mail que recebe os avisos),
-   `EMAIL_REMETENTE` (ex.: `Gaúcha Impressoras <avisos@seudominio.com.br>`) e `WEBHOOK_SECRET` (uma senha longa qualquer).
+   cole o conteúdo de `supabase/functions/notificar/index.ts` e faça o deploy
+   (se a função já existe, abra *Code*, cole a versão nova e clique em **Deploy updates**).
+   Em *Settings* da função, desligue **Verify JWT** (a função confere um segredo próprio).
+3. *Edge Functions → Secrets*: crie `GMAIL_USUARIO` (o Gmail), `GMAIL_SENHA_APP` (a senha de app),
+   `EMAIL_DONO` (quem recebe os avisos de novo pedido) e `WEBHOOK_SECRET` (uma senha longa qualquer).
+   > Se um dia tiverem domínio próprio, dá para usar o Resend: apague os dois secrets do Gmail e crie `RESEND_API_KEY` e `EMAIL_REMETENTE`.
 4. Ligue os avisos. Escolha **um** dos dois jeitos:
    - **Por SQL (mais fácil):** abra `supabase/webhooks.sql`, troque `TROQUE_PELO_WEBHOOK_SECRET` pelo mesmo valor do `WEBHOOK_SECRET` e rode no SQL Editor.
    - **Pela tela:** *Integrations → Database Webhooks* (se pedir, clique em **Enable webhooks**) → **Create a new hook**, duas vezes:

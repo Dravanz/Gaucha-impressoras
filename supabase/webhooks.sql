@@ -24,5 +24,5 @@ create trigger trg_notificar after insert or update of status on public.reservas
   for each row execute function public.avisar_notificar();
 
 drop trigger if exists trg_notificar on public.chamados;
-create trigger trg_notificar after insert on public.chamados
+create trigger trg_notificar after insert or update of status on public.chamados
   for each row execute function public.avisar_notificar();

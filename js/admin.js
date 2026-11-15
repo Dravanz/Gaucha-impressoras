@@ -166,7 +166,7 @@
   async function refreshCounts() {
     const set = (id, n) => { const el = $("tabs").querySelector(`[data-id="${id}"] .count`); if (el) { el.textContent = n; el.hidden = !n; } };
     const r = await db.from("reservas").select("id").eq("status", "pendente");
-    const c = await db.from("chamados").select("id").eq("status", "aberto");
+    const c = await db.from("chamados").select("id").eq("status", "pendente");
     set("reservas", r.data ? r.data.length : 0);
     set("chamados", c.data ? c.data.length : 0);
   }
@@ -345,36 +345,85 @@
   }
 
   // ---------- chamados de manutenção ----------
-  const STC = { aberto: "Novo", em_andamento: "Em andamento", concluido: "Concluído" };
-  let filtroCh = "aberto";
+  const STC = { pendente: "Pendente", aceita: "Aceita", recusada: "Recusada", concluida: "Concluída" };
+  const STC_PL = { pendente: "Pendentes", aceita: "Aceitas", recusada: "Recusadas", concluida: "Concluídas" };
+  const STC_CSS = { pendente: "pendente", aceita: "aprovada", recusada: "recusada", concluida: "cancelada" };
+  let filtroCh = "pendente";
+
+  function msgChamado(c) {
+    const ola = `Olá, ${primeiro(c.nome)}! Aqui é da ${C.marca.a} ${C.marca.b}, sobre o protocolo de manutenção ${c.codigo} (${c.modelo}).`;
+    if (c.status === "aceita") return `${ola}\n\nSeu pedido foi ACEITO ✅${c.resposta ? "\n\n" + c.resposta : ""}\n\nQualquer dúvida é só responder esta mensagem.`;
+    if (c.status === "recusada") return `${ola}\n\nInfelizmente não conseguimos atender este pedido.${c.resposta ? "\n\nMotivo: " + c.resposta : ""}`;
+    if (c.status === "concluida") return `${ola}\n\nA manutenção foi concluída ✅${c.resposta ? "\n\n" + c.resposta : ""}`;
+    return `${ola}\n\nRecebemos seu pedido e já estamos analisando.`;
+  }
+  const avisosCh = (c) => [
+    h("a", { class: "btn btn--wa btn--sm", href: wa(c.telefone, msgChamado(c)), target: "_blank", rel: "noopener noreferrer" }, icon("wa"), c.status === "pendente" ? "Responder" : "Avisar no WhatsApp"),
+    c.email && !C.emailAutomatico && c.status !== "pendente" && h("a", { class: "btn btn--sm", href: `mailto:${c.email}?subject=${encodeURIComponent("Protocolo " + c.codigo)}&body=${encodeURIComponent(msgChamado(c))}` }, icon("mail"), "Enviar e-mail"),
+  ];
+
   async function drawChamados() {
     const { data, error } = await db.from("chamados").select("*").order("criado_em", { ascending: false }).limit(300);
     if (error) return $("rows").replaceChildren(h("p", { class: "empty", text: friendly(error) }));
     const all = data || [];
     const seg = h("div", { class: "seg" }, [...Object.keys(STC), "todos"].map((s) => {
-      const b = h("button", { type: "button", "aria-pressed": s === filtroCh ? "true" : "false", text: s === "todos" ? `Todos (${all.length})` : `${STC[s]} (${all.filter((c) => c.status === s).length})` });
+      const b = h("button", { type: "button", "aria-pressed": s === filtroCh ? "true" : "false", text: s === "todos" ? `Todos (${all.length})` : `${STC_PL[s]} (${all.filter((c) => c.status === s).length})` });
       b.addEventListener("click", () => { filtroCh = s; drawChamados(); });
       return b;
     }));
-    const list = all.filter((c) => filtroCh === "todos" || c.status === filtroCh);
+    let list = all.filter((c) => filtroCh === "todos" || c.status === filtroCh);
+    if (filtroCh === "pendente") list = list.reverse();
     $("rows").replaceChildren(seg,
-      h("p", { class: "adm__hint", text: "Pedidos enviados pelo formulário de manutenção do site (o cliente também foi direcionado para o WhatsApp)." }),
-      ...(list.length ? list.map((c) => {
-        const mv = (st, label, cls) => { const b = h("button", { type: "button", class: "btn btn--sm " + (cls || ""), text: label }); b.addEventListener("click", async () => {
-          const r = await db.from("chamados").update({ status: st }).eq("id", c.id).select();
-          if (r.error || !r.data?.length) return toast(r.error ? friendly(r.error) : "Sem permissão.", true);
-          toast("Chamado atualizado"); drawChamados(); refreshCounts();
-        }); return b; };
-        const foto = imgUrl(c.foto);
-        return h("article", { class: "res " + (c.status === "aberto" ? "res--pendente" : c.status === "concluido" ? "res--cancelada" : "res--aprovada") },
-          h("div", { class: "res__top" }, h("div", {}, h("b", { text: c.modelo }), h("small", { text: `${c.codigo} · ${quando(c.criado_em)}` })), h("span", { class: "st " + (c.status === "aberto" ? "st--pendente" : c.status === "concluido" ? "st--cancelada" : "st--aprovada"), text: STC[c.status] })),
-          h("div", { class: "res__grid" }, h("div", {}, h("span", { text: "Cliente" }), h("b", { text: c.nome })), h("div", {}, h("span", { text: "WhatsApp" }), h("b", { text: fmtFone(c.telefone) }))),
-          h("p", { class: "res__obs", text: c.descricao }),
-          foto && h("a", { href: foto, target: "_blank", rel: "noopener noreferrer" }, h("img", { class: "ch__img", src: foto, alt: "Foto enviada pelo cliente", loading: "lazy" })),
-          h("div", { class: "res__btns" },
-            c.status !== "em_andamento" && mv("em_andamento", "Em andamento"), c.status !== "concluido" && mv("concluido", "Concluído", "btn--ok"), c.status !== "aberto" && mv("aberto", "Voltar para novo", "btn--ghost"),
-            h("a", { class: "btn btn--wa btn--sm", href: wa(c.telefone, `Olá, ${primeiro(c.nome)}! Aqui é da ${C.marca.a} ${C.marca.b}, sobre a manutenção da sua ${c.modelo} (chamado ${c.codigo}).`), target: "_blank", rel: "noopener noreferrer" }, icon("wa"), "Responder")));
-      }) : [h("p", { class: "empty", text: "Nenhum chamado aqui." })]));
+      h("p", { class: "adm__hint", text: filtroCh === "pendente" ? "Protocolos abertos pelo site esperando sua análise. Aceite ou recuse: o cliente é avisado." : "" }),
+      ...(list.length ? list.map(chCard) : [h("p", { class: "empty", text: filtroCh === "pendente" ? "Nenhum protocolo pendente. 🎉" : "Nenhum protocolo aqui." })]));
+  }
+
+  function chCard(c) {
+    const B = (label, cls, fn) => { const b = h("button", { type: "button", class: "btn btn--sm " + (cls || ""), text: label }); b.addEventListener("click", fn); return b; };
+    const btns = [];
+    if (c.status === "pendente") btns.push(B("Aceitar", "btn--ok", () => decidirCh(c, "aceita")), B("Recusar", "btn--danger", () => decidirCh(c, "recusada")));
+    if (c.status === "aceita") btns.push(B("Marcar como concluída", "btn--ok", () => decidirCh(c, "concluida")));
+    if (c.status === "recusada" || c.status === "concluida") btns.push(B("Reabrir como pendente", "btn--ghost", () => decidirCh(c, "pendente")));
+    const foto = imgUrl(c.foto);
+    return h("article", { class: "res res--" + STC_CSS[c.status] },
+      h("div", { class: "res__top" }, h("div", {}, h("b", { text: c.modelo }), h("small", { text: `${c.codigo} · aberto em ${quando(c.criado_em)}` })), h("span", { class: "st st--" + STC_CSS[c.status], text: STC[c.status] })),
+      h("div", { class: "res__grid" },
+        h("div", {}, h("span", { text: "Cliente" }), h("b", { text: c.nome })),
+        h("div", {}, h("span", { text: "Contato" }), h("b", {}, fmtFone(c.telefone), c.email ? h("small", { class: "mono", text: " · " + c.email }) : null))),
+      h("p", { class: "res__obs", text: c.descricao }),
+      foto && h("a", { href: foto, target: "_blank", rel: "noopener noreferrer" }, h("img", { class: "ch__img", src: foto, alt: "Foto enviada pelo cliente", loading: "lazy" })),
+      c.resposta && h("p", { class: "res__obs", text: "Sua resposta: " + c.resposta }),
+      c.decidido_em && h("small", { class: "mono text", text: `${STC[c.status]} em ${quando(c.decidido_em)}${c.decidido_por ? " por " + c.decidido_por : ""}` }),
+      h("div", { class: "res__btns" }, btns, avisosCh(c)));
+  }
+
+  function decidirCh(c, status) {
+    const resp = h("textarea", { name: "resposta", maxlength: "500", placeholder: status === "aceita" ? "Ex.: Pode trazer a impressora amanhã às 9h. O diagnóstico é feito na hora." : status === "recusada" ? "Ex.: Não trabalhamos com esse modelo." : status === "concluida" ? "Ex.: Já pode retirar. Trocamos o rolete de tração." : "" });
+    resp.value = status === "pendente" ? c.resposta || "" : "";
+    const titulo = { aceita: "Aceitar manutenção", recusada: "Recusar manutenção", concluida: "Concluir manutenção", pendente: "Reabrir protocolo" }[status];
+    dialog({ title: titulo, save: { aceita: "Aceitar", recusada: "Recusar", concluida: "Marcar como concluída", pendente: "Reabrir" }[status], saveCls: status === "recusada" ? "btn--danger" : status === "pendente" ? "btn--ink" : "btn--ok",
+      body: [
+        h("div", { class: "sum" }, h("b", { text: c.modelo }), h("br"), `${c.codigo} · ${c.nome} · ${fmtFone(c.telefone)}`, h("br"), c.descricao),
+        status !== "pendente" && h("label", { class: "f" }, h("span", { text: status === "recusada" ? "Motivo (opcional, vai para o cliente)" : "Mensagem para o cliente (opcional)" }), resp),
+      ] });
+    onSubmit = async () => {
+      const upd = { status };
+      if (status !== "pendente") upd.resposta = resp.value.trim().slice(0, 500);
+      const res = await db.from("chamados").update(upd).eq("id", c.id).select();
+      if (res.error) throw res.error;
+      if (!res.data?.length) throw new Error("Sem permissão ou sessão expirada. Entre de novo.");
+      const nc = res.data[0];
+      drawChamados(); refreshCounts();
+      if (status === "pendente") { toast("Protocolo reaberto"); return false; }
+      $("fields").replaceChildren(h("div", { class: "notify" },
+        h("p", {}, h("b", { text: { aceita: "Manutenção aceita!", recusada: "Pedido recusado.", concluida: "Manutenção concluída!" }[status] })),
+        nc.email && C.emailAutomatico
+          ? h("p", { text: `✉️ E-mail enviado automaticamente para ${nc.email}. Se quiser, avise também pelo WhatsApp (a mensagem já vai pronta).` })
+          : h("p", { text: `Agora avise ${primeiro(nc.nome)}: o WhatsApp abre com a mensagem pronta.` }),
+        avisosCh(nc)));
+      $("form-foot").hidden = true;
+      return true;
+    };
   }
 
   // ---------- informações ----------
@@ -402,7 +451,7 @@
 
   // ---------- log de alterações ----------
   const LOG_TABELAS = { config: "Informações", equipe_admin: "Acessos", impressoras: "Impressoras", reservas: "Reservas", chamados: "Manutenção" };
-  const LOG_CAMPOS = { chave: "Campo", valor: "Valor", email: "E-mail", papel: "Papel", status: "Situação", valor_final: "Valor final", resposta: "Resposta", nota: "Nota", inicio: "Início", fim: "Fim", nome: "Nome", telefone: "Telefone", valor_estimado: "Valor do site", impressora_nome: "Impressora" };
+  const LOG_CAMPOS = { modelo: "Modelo", descricao: "Descrição", chave: "Campo", valor: "Valor", email: "E-mail", papel: "Papel", status: "Situação", valor_final: "Valor final", resposta: "Resposta", nota: "Nota", inicio: "Início", fim: "Fim", nome: "Nome", telefone: "Telefone", valor_estimado: "Valor do site", impressora_nome: "Impressora" };
   TABS.impressoras.fields.forEach((f) => { LOG_CAMPOS["impressoras." + f.k] = f.label.replace(/ \(.*\)$/, ""); });
   const ACOES = { criou: "Criou", alterou: "Alterou", excluiu: "Excluiu" };
   function logValor(k, v) {
@@ -588,8 +637,8 @@
         R({ codigo: "GI-C4J7KL", impressora_id: "d3", impressora_nome: "HP Laser 107w", nome: "Pedro Rocha", telefone: "5553999990006", inicio: d(2), fim: d(3), valor_estimado: 70, status: "recusada", resposta: "Impressora em revisão nessas datas.", decidido_em: agora }),
       ],
       chamados: [
-        { id: "c1", codigo: "GM-R5T8UV", nome: "Lucas Martins", telefone: "5553999990007", modelo: "Epson L3150", descricao: "Está imprimindo com listras brancas no preto, já fiz limpeza de cabeçote.", foto: null, status: "aberto", nota: "", criado_em: agora },
-        { id: "c2", codigo: "GM-X2Y3ZA", nome: "Fernanda Dias", telefone: "5553999990008", modelo: "HP LaserJet M1132", descricao: "Papel enrosca na saída e aparece luz laranja piscando.", foto: null, status: "em_andamento", nota: "", criado_em: agora },
+        { id: "c1", codigo: "GM-R5T8UV", nome: "Lucas Martins", telefone: "5553999990007", modelo: "Epson L3150", descricao: "Está imprimindo com listras brancas no preto, já fiz limpeza de cabeçote.", email: "lucas@exemplo.com", foto: null, status: "pendente", resposta: "", nota: "", criado_em: agora },
+        { id: "c2", codigo: "GM-X2Y3ZA", nome: "Fernanda Dias", telefone: "5553999990008", modelo: "HP LaserJet M1132", descricao: "Papel enrosca na saída e aparece luz laranja piscando.", foto: null, status: "aceita", resposta: "Pode trazer amanhã às 9h.", nota: "", criado_em: agora, decidido_em: agora },
       ],
       config: [{ chave: "whatsapp", valor: C.whatsapp }, { chave: "horario", valor: "Seg a sex · 08:30 às 18:00" }],
       log_alteracoes: [],
@@ -615,7 +664,7 @@
           for (const r of tab.filter(m)) {
             const nr = { ...r, ...this.v };
             if (this.t === "reservas" && conflita(nr, tab)) return { data: null, error: { message: "conflicting key value violates exclusion constraint \"sem_conflito\"" } };
-            if (this.t === "reservas" && nr.status !== r.status) { nr.decidido_em = new Date().toISOString(); nr.decidido_por = "demonstração"; }
+            if ((this.t === "reservas" || this.t === "chamados") && nr.status !== r.status) { nr.decidido_em = new Date().toISOString(); nr.decidido_por = "demonstração"; }
             Object.assign(r, nr); out.push(r);
           }
           return { data: out, error: null };

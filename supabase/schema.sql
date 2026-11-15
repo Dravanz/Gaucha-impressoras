@@ -161,7 +161,10 @@ create trigger trg_decisao before update on public.reservas
   for each row execute function public.reserva_decisao();
 
 -- ---------------------------------------------------------------------
--- 5. Chamados de manutenção (histórico para o painel)
+-- 5. Chamados de manutenção (protocolos)
+--    pendente -> aguardando a Gaúcha analisar
+--    aceita / recusada -> decisão (o cliente é avisado)
+--    concluida -> serviço terminado
 -- ---------------------------------------------------------------------
 create table if not exists public.chamados (
   id          uuid primary key default gen_random_uuid(),
@@ -170,12 +173,40 @@ create table if not exists public.chamados (
   telefone    text not null check (telefone ~ '^\d{12,13}$'),
   modelo      text not null check (char_length(modelo) between 2 and 80),
   descricao   text not null check (char_length(descricao) between 5 and 1000),
+  email       text check (email is null or (char_length(email) <= 120 and email ~ '^[^\s@]+@[^\s@]+\.[^\s@]+$')),
   foto        text check (foto is null or foto ~ '^manutencao/[A-Za-z0-9-]+\.webp$'),
-  status      text not null default 'aberto' check (status in ('aberto', 'em_andamento', 'concluido')),
+  status      text not null default 'pendente',
+  resposta    text not null default '' check (char_length(resposta) <= 500),
   nota        text not null default '' check (char_length(nota) <= 500),
+  decidido_em timestamptz,
+  decidido_por text,
   criado_em   timestamptz not null default now(),
   atualizado_em timestamptz not null default now()
 );
+
+-- Atualização de quem já tinha rodado a versão anterior (pode rodar de novo)
+alter table public.chamados add column if not exists email text check (email is null or (char_length(email) <= 120 and email ~ '^[^\s@]+@[^\s@]+\.[^\s@]+$'));
+alter table public.chamados add column if not exists resposta text not null default '' check (char_length(resposta) <= 500);
+alter table public.chamados add column if not exists decidido_em timestamptz;
+alter table public.chamados add column if not exists decidido_por text;
+alter table public.chamados drop constraint if exists chamados_status_check;
+update public.chamados set status = case status when 'aberto' then 'pendente' when 'em_andamento' then 'aceita' when 'concluido' then 'concluida' else status end
+  where status in ('aberto', 'em_andamento', 'concluido');
+alter table public.chamados alter column status set default 'pendente';
+alter table public.chamados add constraint chamados_status_check check (status in ('pendente', 'aceita', 'recusada', 'concluida'));
+
+create or replace function public.chamado_decisao()
+returns trigger language plpgsql set search_path = '' as $$
+begin
+  if new.status is distinct from old.status then
+    new.decidido_em := now();
+    new.decidido_por := coalesce(auth.jwt() ->> 'email', 'Supabase');
+  end if;
+  return new;
+end $$;
+drop trigger if exists trg_decisao on public.chamados;
+create trigger trg_decisao before update on public.chamados
+  for each row execute function public.chamado_decisao();
 
 -- Informações gerais (WhatsApp, e-mail, endereço...) — uma linha por chave.
 create table if not exists public.config (
@@ -279,16 +310,19 @@ begin
 end $$;
 
 -- Chamado de manutenção feito pelo site
+drop function if exists public.abrir_chamado(text, text, text, text, text);
 create or replace function public.abrir_chamado(
-  p_nome text, p_telefone text, p_modelo text, p_descricao text, p_foto text default null)
+  p_nome text, p_telefone text, p_modelo text, p_descricao text, p_foto text default null, p_email text default null)
 returns text
 language plpgsql volatile security definer set search_path = ''
 as $$
 declare
   tel text := public.so_digitos_fone(p_telefone);
   cod text;
+  mail text := nullif(lower(trim(coalesce(p_email, ''))), '');
 begin
   if tel !~ '^\d{12,13}$' then raise exception 'TELEFONE_INVALIDO'; end if;
+  if mail is not null and mail !~ '^[^\s@]+@[^\s@]+\.[^\s@]+$' then raise exception 'EMAIL_INVALIDO'; end if;
   if (select count(*) from public.chamados c where c.telefone = tel and c.criado_em > now() - interval '1 day') >= 5 then
     raise exception 'MUITOS_PEDIDOS';
   end if;
@@ -296,15 +330,15 @@ begin
     cod := public.novo_codigo('GM');
     exit when not exists (select 1 from public.chamados c where c.codigo = cod);
   end loop;
-  insert into public.chamados (codigo, nome, telefone, modelo, descricao, foto)
-  values (cod, left(trim(p_nome), 80), tel, left(trim(p_modelo), 80), left(trim(p_descricao), 1000), nullif(p_foto, ''));
+  insert into public.chamados (codigo, nome, telefone, email, modelo, descricao, foto)
+  values (cod, left(trim(p_nome), 80), tel, left(mail, 120), left(trim(p_modelo), 80), left(trim(p_descricao), 1000), nullif(p_foto, ''));
   return cod;
 end $$;
 
 revoke all on function public.datas_ocupadas(uuid), public.solicitar_reserva(uuid, date, date, text, text, text, text, text),
-  public.abrir_chamado(text, text, text, text, text), public.novo_codigo(text) from public;
+  public.abrir_chamado(text, text, text, text, text, text), public.novo_codigo(text) from public;
 grant execute on function public.datas_ocupadas(uuid), public.solicitar_reserva(uuid, date, date, text, text, text, text, text),
-  public.abrir_chamado(text, text, text, text, text) to anon, authenticated;
+  public.abrir_chamado(text, text, text, text, text, text) to anon, authenticated;
 
 -- ---------------------------------------------------------------------
 -- 7. Row Level Security
@@ -348,7 +382,7 @@ grant select on public.impressoras, public.config to anon;
 grant select, insert, update, delete on public.impressoras, public.config to authenticated;
 grant select, delete on public.reservas, public.chamados to authenticated;
 grant update (status, valor_final, resposta) on public.reservas to authenticated;
-grant update (status, nota) on public.chamados to authenticated;
+grant update (status, nota, resposta) on public.chamados to authenticated;
 revoke all on public.reservas, public.chamados from anon;
 revoke all on public.equipe_admin from anon, authenticated;
 
@@ -448,6 +482,16 @@ begin
     execute format('create trigger trg_log after insert or update or delete on public.%I
                     for each row execute function public.registrar_log()', t);
   end loop;
+end $$;
+
+-- Se o e-mail automático (supabase/webhooks.sql) já estiver ligado,
+-- avisa também quando um protocolo de manutenção é aceito/recusado/concluído.
+do $$ begin
+  if exists (select 1 from pg_proc where proname = 'avisar_notificar' and pronamespace = 'public'::regnamespace) then
+    drop trigger if exists trg_notificar on public.chamados;
+    create trigger trg_notificar after insert or update of status on public.chamados
+      for each row execute function public.avisar_notificar();
+  end if;
 end $$;
 
 -- ---------------------------------------------------------------------

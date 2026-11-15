@@ -427,13 +427,14 @@
       e.preventDefault();
       const fd = new FormData(e.target), v = (k) => String(fd.get(k) || "").trim(), err = $("mt-err");
       err.textContent = "";
-      const nome = v("nome"), tel = fone(v("telefone")), modelo = v("modelo"), desc = v("descricao");
+      const nome = v("nome"), tel = fone(v("telefone")), modelo = v("modelo"), desc = v("descricao"), email = v("email").toLowerCase();
       if (nome.length < 2) return (err.textContent = "Informe seu nome.");
       if (!/^\d{12,13}$/.test(tel)) return (err.textContent = "Informe o WhatsApp com DDD, ex.: (53) 99999-9999.");
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return (err.textContent = "E-mail inválido.");
       if (modelo.length < 2) return (err.textContent = "Informe o modelo da impressora.");
       if (desc.length < 5) return (err.textContent = "Conte um pouco do que está acontecendo.");
       const btn = $("mt-enviar"); btn.disabled = true;
-      let fotoUrl = null, codigo = null, fotoAviso = false;
+      let codigo = null, semFoto = false;
       try {
         if (LIVE) {
           let path = null;
@@ -443,30 +444,37 @@
               path = `manutencao/${crypto.randomUUID()}.webp`;
               const up = await db.storage.from("imagens").upload(path, blob, { contentType: "image/webp", upsert: false });
               if (up.error) throw up.error;
-              fotoUrl = imgUrl(path);
-            } catch (ex) { console.error(ex); path = null; fotoAviso = true; }
+            } catch (ex) { console.error(ex); path = null; semFoto = true; }
           }
-          const { data, error } = await db.rpc("abrir_chamado", { p_nome: nome, p_telefone: tel, p_modelo: modelo, p_descricao: desc, p_foto: path });
-          if (error) console.error(error.message); else codigo = data;
-        } else if (foto) fotoAviso = true;
+          const { data, error } = await db.rpc("abrir_chamado", { p_nome: nome, p_telefone: tel, p_modelo: modelo, p_descricao: desc, p_foto: path, p_email: email || null });
+          if (error) throw error;
+          codigo = data;
+        } else codigo = "GM-DEMO" + Math.floor(Math.random() * 90 + 10);
+      } catch (ex) {
+        console.error(ex);
+        const m = (ex && ex.message) || "";
+        err.textContent = /MUITOS_PEDIDOS/.test(m) ? "Você já abriu vários protocolos hoje. Fale com a Gaúcha no WhatsApp."
+          : /TELEFONE_INVALIDO/.test(m) ? "Confira o WhatsApp com DDD." : /EMAIL_INVALIDO/.test(m) ? "E-mail inválido."
+          : "Não foi possível enviar agora. Tente de novo em instantes ou chame no WhatsApp.";
+        return;
       } finally { btn.disabled = false; }
 
-      const msg = [`Olá, Gaúcha! Preciso de manutenção na minha impressora.`, ``, codigo && `Chamado: ${codigo}`, `Nome: ${nome}`, `Modelo: ${modelo}`, `Problema: ${desc}`,
-        fotoUrl ? `Foto: ${fotoUrl}` : fotoAviso ? `Vou mandar a foto aqui na conversa.` : null].filter((x) => x != null && x !== false).join("\n");
-      const url = waLink(WA, msg);
+      const st = status();
+      const msg = `Olá, Gaúcha! Abri o protocolo de manutenção ${codigo} pelo site (${modelo}).`;
       $("mt-form").hidden = true;
-      const again = h("button", { class: "btn btn--ghost btn--sm", type: "button", text: "Enviar outro pedido" });
+      const again = h("button", { class: "btn btn--ghost btn--sm", type: "button", text: "Abrir outro protocolo" });
       again.addEventListener("click", () => { $("mt-done").hidden = true; $("mt-form").hidden = false; e.target.reset(); reset(); });
       $("mt-done").replaceChildren(
         h("div", { class: "done__ico", "aria-hidden": "true", text: "✓" }),
-        h("h3", { text: "Quase lá!" }),
-        codigo && h("code", { text: codigo }),
-        h("p", { text: "Abrimos o WhatsApp com a mensagem pronta. Se não abriu sozinho, toque no botão abaixo e depois em enviar." }),
-        fotoAviso && h("p", { text: "Anexe a foto direto na conversa do WhatsApp." }),
-        h("a", { class: "btn btn--wa", href: url, target: "_blank", rel: "noopener noreferrer" }, icon("wa"), "Abrir WhatsApp"),
+        h("h3", { text: "Protocolo aberto!" }),
+        h("code", { text: codigo }),
+        h("p", { text: `A Gaúcha já recebeu o seu pedido e vai analisar${st.open ? "" : " assim que abrir (" + st.longo.replace(/^Fechado · /, "") + ")"}. ` +
+          `Você recebe a resposta ${email ? "no e-mail " + email + " ou " : ""}pelo WhatsApp informado. Guarde o número do protocolo.` }),
+        semFoto ? h("p", { text: "Não conseguimos enviar a foto. Se quiser, mande depois pelo WhatsApp junto com o número do protocolo." }) : "",
+        h("a", { class: "btn btn--sm btn--ghost", href: waLink(WA, msg), target: "_blank", rel: "noopener noreferrer" }, icon("wa"), "Falar com a Gaúcha no WhatsApp"),
         again);
       $("mt-done").hidden = false;
-      window.open(url, "_blank", "noopener");
+      $("mt-done").scrollIntoView({ behavior: "smooth", block: "center" });
     });
   }
 

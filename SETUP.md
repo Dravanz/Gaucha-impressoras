@@ -53,7 +53,7 @@ Depois atualize **Site URL** e **Redirect URLs** no Supabase e os links do `404.
 ## 5. E-mail automático (opcional)
 
 Sem isso tudo funciona: o dono é avisado pelo WhatsApp do cliente e avisa o cliente com um toque no painel.
-Com isso, os e-mails saem sozinhos (novo pedido → dono; aprovado/recusado/cancelado → cliente; nova manutenção → dono).
+Com isso, os e-mails saem sozinhos (novo pedido → dono; aprovado/recusado/cancelado → cliente; novo protocolo de manutenção → dono; manutenção aceita/recusada/concluída → cliente, se ele informou e-mail).
 
 Os e-mails saem pelo **Gmail da Gaúcha** (grátis, até ~500 por dia, sem precisar de domínio).
 
@@ -69,10 +69,17 @@ Os e-mails saem pelo **Gmail da Gaúcha** (grátis, até ~500 por dia, sem preci
 4. Ligue os avisos. Escolha **um** dos dois jeitos:
    - **Por SQL (mais fácil):** abra `supabase/webhooks.sql`, troque `TROQUE_PELO_WEBHOOK_SECRET` pelo mesmo valor do `WEBHOOK_SECRET` e rode no SQL Editor.
    - **Pela tela:** *Integrations → Database Webhooks* (se pedir, clique em **Enable webhooks**) → **Create a new hook**, duas vezes:
-     tabela `reservas` (eventos Insert e Update) e tabela `chamados` (evento Insert); tipo **Supabase Edge Functions**, função `notificar`, método POST;
+     tabela `reservas` (eventos Insert e Update) e tabela `chamados` (eventos Insert e Update); tipo **Supabase Edge Functions**, função `notificar`, método POST;
      em *HTTP Headers* adicione `x-webhook-secret` com o mesmo valor do `WEBHOOK_SECRET`.
 5. Teste: faça um pedido de locação no site e veja se o e-mail chega no `EMAIL_DONO`.
    Se não chegar, veja *Edge Functions → notificar → Logs*.
+
+## Atualizações
+
+Quando uma versão nova mexer no banco ou na função (como a **manutenção por protocolo**):
+1. Rode de novo o `supabase/schema.sql` inteiro no SQL Editor. Ele é seguro para rodar outra vez: só acrescenta o que falta,
+   converte os chamados antigos (aberto → pendente, em andamento → aceita, concluído → concluída) e, se o `webhooks.sql` já foi rodado, religa o aviso de manutenção.
+2. Em *Edge Functions → notificar → Code*, cole a versão nova de `supabase/functions/notificar/index.ts` e clique em **Deploy updates**.
 
 ## Limites do plano grátis (Supabase Free)
 

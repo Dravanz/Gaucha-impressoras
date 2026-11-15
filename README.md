@@ -5,7 +5,7 @@ administrativo para o dono cadastrar impressoras e aprovar as locações pelo ce
 
 - **Início** (`index.html`): apresentação, serviços, impressoras em destaque, como funciona e horário (com aviso "aberto agora / fechado").
 - **Locação** (`locacao.html`): catálogo com foto, marca, recursos e valor por dia (com desconto e desconto para período longo). O cliente marca o período no calendário, vê o total na hora e envia o pedido. As datas ficam **pendentes** (bloqueadas para outros clientes) até o dono aprovar ou recusar.
-- **Manutenção** (`manutencao.html`): formulário com modelo, foto opcional e descrição que abre o WhatsApp da Gaúcha (53 99202-3930) com a mensagem pronta.
+- **Manutenção** (`manutencao.html`): o cliente abre um protocolo (modelo, foto opcional, descrição, e-mail opcional) e recebe um número `GM-…`. O protocolo fica **pendente** no painel, a Gaúcha recebe um e-mail na hora e decide: aceita, recusa ou marca como concluída. O cliente é avisado por e-mail (e pelo WhatsApp com um toque).
 - **Painel** (`admin.html`): login com Google, só para e-mails cadastrados no Supabase. Abas: Reservas (aprovar, recusar, ajustar valor/desconto, cancelar, avisar o cliente), Agenda (próximos 45 dias), Impressoras (cadastro/edição/foto/preço/descontos), Manutenção, Informações e Log.
 
 Identidade "papel e tinta": fundo de papel, formulário contínuo, cupom fiscal e as cores da marca

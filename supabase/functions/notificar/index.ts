@@ -3,7 +3,8 @@
 //  Disparada pelas tabelas "reservas" e "chamados" (supabase/webhooks.sql):
 //   - novo pedido de locação  -> e-mail para o dono
 //   - pedido aprovado/recusado/cancelado -> e-mail para o cliente (se informou)
-//   - novo chamado de manutenção -> e-mail para o dono
+//   - novo protocolo de manutenção -> e-mail para o dono
+//   - manutenção aceita/recusada/concluída -> e-mail para o cliente (se informou)
 //
 //  Envio pelo GMAIL da Gaúcha (grátis, sem domínio próprio). Secrets:
 //    GMAIL_USUARIO   ex.: gauchaimpressoras@gmail.com
@@ -70,7 +71,19 @@ Deno.serve(async (req) => {
     ].filter(Boolean));
   }
   if (table === "chamados" && type === "INSERT" && dono) {
-    await enviar(dono, `Novo chamado de manutenção · ${r.codigo}`, [`Modelo: ${r.modelo}`, `Cliente: ${r.nome} · WhatsApp ${r.telefone}`, `Problema: ${r.descricao}`]);
+    const foto = r.foto ? `${env("SUPABASE_URL")}/storage/v1/object/public/imagens/${r.foto}` : "";
+    await enviar(dono, `Novo protocolo de manutenção · ${r.codigo}`, [
+      `Protocolo ${r.codigo} aguardando análise no painel (aba Manutenção).`, `Modelo: ${r.modelo}`,
+      `Cliente: ${r.nome} · WhatsApp ${r.telefone}`, r.email ? `E-mail: ${r.email}` : "", `Problema: ${r.descricao}`, foto ? `Foto: ${foto}` : "",
+    ].filter(Boolean));
+  }
+  if (table === "chamados" && type === "UPDATE" && r.status !== o?.status && r.email && ["aceita", "recusada", "concluida"].includes(r.status)) {
+    const t = { aceita: "Seu pedido de manutenção foi aceito ✅", recusada: "Não conseguimos atender seu pedido de manutenção", concluida: "Sua manutenção foi concluída ✅" }[r.status as string]!;
+    await enviar(r.email, `${t} · ${r.codigo}`, [
+      `Olá, ${String(r.nome).split(" ")[0]}!`, t + ".", `Protocolo: ${r.codigo}`, `Impressora: ${r.modelo}`,
+      r.resposta ? (r.status === "recusada" ? `Motivo: ${r.resposta}` : r.resposta) : "",
+      "Qualquer dúvida, fale com a gente pelo WhatsApp (53) 99202-3930.",
+    ].filter(Boolean));
   }
   return new Response("ok");
 });

@@ -6,11 +6,11 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <title>Manutenção de impressoras · Gaúcha Impressoras</title>
-  <meta name="description" content="Conte o problema da sua impressora, mande uma foto e fale direto com a Gaúcha pelo WhatsApp.">
+  <meta name="description" content="Abra um protocolo de manutenção: conte o problema da sua impressora, mande uma foto e a Gaúcha responde por e-mail ou WhatsApp.">
   <meta name="theme-color" content="#f6f3ea">
   <meta property="og:title" content="Manutenção de impressoras · Gaúcha Impressoras">
   <meta property="og:image" content="img/logo.png">
-  <meta property="og:description" content="Conte o problema da sua impressora, mande uma foto e fale direto com a Gaúcha pelo WhatsApp.">
+  <meta property="og:description" content="Abra um protocolo de manutenção: conte o problema da sua impressora, mande uma foto e a Gaúcha responde por e-mail ou WhatsApp.">
   <link rel="icon" href="img/logo-simbolo.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="img/logo-simbolo.png">
   <link rel="preload" href="fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
@@ -40,7 +40,7 @@
       <div>
         <p class="tag">Manutenção</p>
         <h1 class="h2">Sua impressora <span class="hl hl--m">deu problema?</span></h1>
-        <p class="lead">Preencha o formulário e ele abre o WhatsApp da Gaúcha com tudo explicado. A gente responde por lá mesmo.</p>
+        <p class="lead">Abra um protocolo pelo site: a Gaúcha recebe na hora, analisa e responde se pode atender, por e-mail ou WhatsApp.</p>
         <ul class="checks">
           <li><b>01</b><span>Informe o modelo da impressora (está na etiqueta da frente ou de trás).</span></li>
           <li><b>02</b><span>Descreva o que acontece: barulho, erro no painel, manchas, papel enroscando…</span></li>
@@ -54,6 +54,7 @@
             <label class="field"><span>Seu nome</span><input name="nome" autocomplete="name" maxlength="80" required></label>
             <label class="field"><span>WhatsApp</span><input name="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(53) 99999-9999" maxlength="20" required></label>
           </div>
+          <label class="field"><span>E-mail <em>(opcional, para receber a resposta)</em></span><input name="email" type="email" autocomplete="email" maxlength="120"></label>
           <label class="field"><span>Modelo da impressora</span><input name="modelo" maxlength="80" placeholder="Ex.: Epson L3250, HP 107w" required></label>
           <label class="field"><span>O que está acontecendo?</span><textarea name="descricao" maxlength="1000" placeholder="Conte com suas palavras. Desde quando acontece? Aparece alguma mensagem?" required></textarea></label>
           <div class="field">
@@ -66,8 +67,8 @@
             </label>
           </div>
           <p class="form__err" id="mt-err" role="alert"></p>
-          <button class="btn btn--wa btn--block" type="submit" id="mt-enviar"><svg><use href="#wa"/></svg>Enviar pelo WhatsApp</button>
-          <p class="fine" id="mt-fine">Ao enviar, o WhatsApp abre com a mensagem pronta. É só tocar em enviar.</p>
+          <button class="btn btn--ink btn--block" type="submit" id="mt-enviar">Abrir protocolo de manutenção <svg><use href="#arrow"/></svg></button>
+          <p class="fine" id="mt-fine">Você recebe um número de protocolo. A Gaúcha analisa e avisa se aceita o serviço.</p>
         </form>
         <div class="done" id="mt-done" hidden></div>
       </div>

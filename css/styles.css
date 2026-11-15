@@ -404,3 +404,8 @@ svg { width: 1em; height: 1em; fill: currentColor; flex: none; }
 .feed::before, .feed::after { z-index: 1; background-color: var(--sheet); }
 .card__foot { flex-wrap: wrap; }
 .receipt { margin-bottom: 18px; }
+
+/* janela de locação: corpo rolável no celular (item de grid precisa de min-height: 0) */
+.sheet__box { grid-template-rows: auto minmax(0, 1fr); max-height: calc(100dvh - 24px); }
+.sheet__body, .sheet__box > .done { min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+@media (max-width: 719px) { .sheet__box { max-height: calc(100dvh - 10px); } }

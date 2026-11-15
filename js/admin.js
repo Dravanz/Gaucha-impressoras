@@ -211,7 +211,7 @@
   const assunto = (r) => ({ aprovada: `Locação confirmada · ${r.codigo}`, recusada: `Sobre o seu pedido ${r.codigo}`, cancelada: `Locação cancelada · ${r.codigo}` }[r.status] || `Seu pedido ${r.codigo}`);
   const avisos = (r) => [
     h("a", { class: "btn btn--wa btn--sm", href: wa(r.telefone, msgCliente(r)), target: "_blank", rel: "noopener noreferrer" }, icon("wa"), "Avisar no WhatsApp"),
-    r.email && h("a", { class: "btn btn--sm", href: `mailto:${r.email}?subject=${encodeURIComponent(assunto(r))}&body=${encodeURIComponent(msgCliente(r))}` }, icon("mail"), "Enviar e-mail"),
+    r.email && !C.emailAutomatico && h("a", { class: "btn btn--sm", href: `mailto:${r.email}?subject=${encodeURIComponent(assunto(r))}&body=${encodeURIComponent(msgCliente(r))}` }, icon("mail"), "Enviar e-mail"),
   ];
 
   async function drawReservas() {
@@ -307,7 +307,9 @@
       const msg = { aprovada: ajuste ? "Locação atualizada." : "Locação aprovada! As datas estão confirmadas.", recusada: "Pedido recusado. As datas foram liberadas.", cancelada: "Locação cancelada. As datas foram liberadas." }[status];
       $("fields").replaceChildren(h("div", { class: "notify" },
         h("p", {}, h("b", { text: msg })),
-        h("p", { text: `Agora avise ${primeiro(nr.nome)}: o WhatsApp abre com a mensagem pronta${nr.email ? " (ou mande por e-mail)" : ""}.` }),
+        nr.email && C.emailAutomatico
+          ? h("p", { text: `✉️ E-mail enviado automaticamente para ${nr.email}. Se quiser, avise também pelo WhatsApp (a mensagem já vai pronta).` })
+          : h("p", { text: `Agora avise ${primeiro(nr.nome)}: o WhatsApp abre com a mensagem pronta${nr.email ? " (ou mande por e-mail)" : ""}.` }),
         avisos(nr)));
       $("form-foot").hidden = true;
       drawReservas(); refreshCounts();

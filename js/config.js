@@ -20,6 +20,10 @@ window.SITE_CONFIG = {
   // Horário de atendimento (horário de Brasília). 1 = segunda ... 5 = sexta
   horario: { dias: [1, 2, 3, 4, 5], abre: "08:30", fecha: "18:00", texto: "Seg a sex · 08:30 às 18:00" },
 
+  // true = a função "notificar" (e-mail automático) está ligada no Supabase.
+  // O painel então não mostra o botão de e-mail manual.
+  emailAutomatico: true,
+
   // Tempo máximo de sessão do painel (o banco também confere isso)
   sessaoMinutos: 15,
 };

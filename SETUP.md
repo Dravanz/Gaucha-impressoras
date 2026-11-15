@@ -63,10 +63,13 @@ Com isso, os e-mails saem sozinhos (novo pedido → dono; aprovado/recusado/canc
    Em *Details*, desligue **Verify JWT** (a função confere um segredo próprio).
 3. *Edge Functions → Secrets*: crie `RESEND_API_KEY`, `EMAIL_DONO` (e-mail que recebe os avisos),
    `EMAIL_REMETENTE` (ex.: `Gaúcha Impressoras <avisos@seudominio.com.br>`) e `WEBHOOK_SECRET` (uma senha longa qualquer).
-4. *Database → Webhooks → Create a new hook*, duas vezes:
-   - tabela `reservas`, eventos **Insert** e **Update**; tabela `chamados`, evento **Insert**;
-   - tipo **Supabase Edge Functions**, função `notificar`, método POST;
-   - em *HTTP Headers* adicione `x-webhook-secret` com o mesmo valor do `WEBHOOK_SECRET`.
+4. Ligue os avisos. Escolha **um** dos dois jeitos:
+   - **Por SQL (mais fácil):** abra `supabase/webhooks.sql`, troque `TROQUE_PELO_WEBHOOK_SECRET` pelo mesmo valor do `WEBHOOK_SECRET` e rode no SQL Editor.
+   - **Pela tela:** *Integrations → Database Webhooks* (se pedir, clique em **Enable webhooks**) → **Create a new hook**, duas vezes:
+     tabela `reservas` (eventos Insert e Update) e tabela `chamados` (evento Insert); tipo **Supabase Edge Functions**, função `notificar`, método POST;
+     em *HTTP Headers* adicione `x-webhook-secret` com o mesmo valor do `WEBHOOK_SECRET`.
+5. Teste: faça um pedido de locação no site e veja se o e-mail chega no `EMAIL_DONO`.
+   Se não chegar, veja *Edge Functions → notificar → Logs*.
 
 ## Limites do plano grátis (Supabase Free)
 

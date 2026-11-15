@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Manutenção de impressoras · Gaúcha Impressoras</title>
+  <meta name="description" content="Conte o problema da sua impressora, mande uma foto e fale direto com a Gaúcha pelo WhatsApp.">
+  <meta name="theme-color" content="#f6f3ea">
+  <meta property="og:title" content="Manutenção de impressoras · Gaúcha Impressoras">
+  <meta property="og:image" content="img/logo.png">
+  <meta property="og:description" content="Conte o problema da sua impressora, mande uma foto e fale direto com a Gaúcha pelo WhatsApp.">
+  <link rel="icon" href="img/logo-simbolo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/logo-simbolo.png">
+  <link rel="preload" href="fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="manutencao">
+<svg class="sprite" aria-hidden="true">
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="wa" viewBox="0 0 24 24"><path d="M4 20l1.2-4A8.5 8.5 0 1 1 8.4 19z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 8.5c0 3.5 2.8 6.5 6.5 6.5l1-1.6-2-1-1 .9a4.6 4.6 0 0 1-2.4-2.4l.9-1-1-2z"/></symbol>
+  <symbol id="printer" viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 17H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-3M7 14h10v7H7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3 6.6-6.6a4 4 0 0 1-5-5L13 5zM3 21l6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="ico-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9.5" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="ig" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.1"/></symbol>
+  <symbol id="camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="truck" viewBox="0 0 24 24"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="7" cy="18" r="2" fill="#fff" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="18" r="2" fill="#fff" stroke="currentColor" stroke-width="2"/></symbol>
+</svg>
+
+<main>
+  <section class="block">
+    <div class="wrap mt">
+      <div>
+        <p class="tag">Manutenção</p>
+        <h1 class="h2">Sua impressora <span class="hl hl--m">deu problema?</span></h1>
+        <p class="lead">Preencha o formulário e ele abre o WhatsApp da Gaúcha com tudo explicado. A gente responde por lá mesmo.</p>
+        <ul class="checks">
+          <li><b>01</b><span>Informe o modelo da impressora (está na etiqueta da frente ou de trás).</span></li>
+          <li><b>02</b><span>Descreva o que acontece: barulho, erro no painel, manchas, papel enroscando…</span></li>
+          <li><b>03</b><span>Se puder, mande uma foto do defeito ou da mensagem de erro.</span></li>
+        </ul>
+        <p class="note" id="mt-hora"></p>
+      </div>
+      <div class="mt__card crop">
+        <form class="form" id="mt-form" novalidate>
+          <div class="row2">
+            <label class="field"><span>Seu nome</span><input name="nome" autocomplete="name" maxlength="80" required></label>
+            <label class="field"><span>WhatsApp</span><input name="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(53) 99999-9999" maxlength="20" required></label>
+          </div>
+          <label class="field"><span>Modelo da impressora</span><input name="modelo" maxlength="80" placeholder="Ex.: Epson L3250, HP 107w" required></label>
+          <label class="field"><span>O que está acontecendo?</span><textarea name="descricao" maxlength="1000" placeholder="Conte com suas palavras. Desde quando acontece? Aparece alguma mensagem?" required></textarea></label>
+          <div class="field">
+            <span>Foto <em>(opcional)</em></span>
+            <label class="drop" id="mt-drop">
+              <input type="file" id="mt-foto" accept="image/*">
+              <svg><use href="#camera"/></svg>
+              <b>Toque para tirar ou escolher uma foto</b>
+              <small>JPG, PNG ou WebP. A foto é reduzida antes de enviar.</small>
+            </label>
+          </div>
+          <p class="form__err" id="mt-err" role="alert"></p>
+          <button class="btn btn--wa btn--block" type="submit" id="mt-enviar"><svg><use href="#wa"/></svg>Enviar pelo WhatsApp</button>
+          <p class="fine" id="mt-fine">Ao enviar, o WhatsApp abre com a mensagem pronta. É só tocar em enviar.</p>
+        </form>
+        <div class="done" id="mt-done" hidden></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="js/config.js"></script>
+<script src="js/vendor/supabase.js"></script>
+<script src="js/demo.js"></script>
+<script src="js/site.js"></script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Gaúcha Impressoras"><defs><clipPath id="r"><rect width="120" height="120" rx="26"/></clipPath></defs><g clip-path="url(#r)"><rect width="120" height="120" rx="26" fill="#fff"/>
+  <path d="M-6 56 A 74 74 0 0 1 128 30" fill="none" stroke="#e3262f" stroke-width="13"/>
+  <path d="M-6 70 A 74 74 0 0 1 128 46" fill="none" stroke="#169b5b" stroke-width="11"/>
+  <path d="M-6 83 A 74 74 0 0 1 128 61" fill="none" stroke="#f7cf1d" stroke-width="10"/>
+  <g transform="translate(16 22) scale(0.63)">
+    <path fill="#fff" stroke="#169b5b" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" d="M34 46 L26 10 L66 0 L74 35"/>
+    <path fill="none" stroke="#169b5b" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" d="M34 20 L60 13 M36 29 L62 22"/>
+    <path fill="none" stroke="#169b5b" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" d="M8 52 L92 30 L132 52 L48 76 Z"/>
+    <path fill="none" stroke="#169b5b" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" d="M8 52 L8 82 L48 108 L48 76 M48 108 L132 84 L132 52"/>
+    <path fill="none" stroke="#169b5b" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" d="M20 72 L40 84"/>
+    <path fill="none" stroke="#169b5b" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" d="M70 88 L112 76 L140 100 L98 114 Z"/>
+    <path fill="none" stroke="#169b5b" stroke-width="7" stroke-linejoin="round" stroke-linecap="round" d="M96 98 L118 92"/>
+  </g></g></svg>

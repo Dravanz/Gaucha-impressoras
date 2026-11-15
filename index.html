@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Gaúcha Impressoras · Locação e manutenção de impressoras</title>
+  <meta name="description" content="Alugue impressoras por dia, escolhendo as datas no calendário, ou peça manutenção direto pelo WhatsApp. Seg a sex, 08:30 às 18:00.">
+  <meta name="theme-color" content="#f6f3ea">
+  <meta property="og:title" content="Gaúcha Impressoras · Locação e manutenção de impressoras">
+  <meta property="og:image" content="img/logo.png">
+  <meta property="og:description" content="Alugue impressoras por dia, escolhendo as datas no calendário, ou peça manutenção direto pelo WhatsApp. Seg a sex, 08:30 às 18:00.">
+  <link rel="icon" href="img/logo-simbolo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/logo-simbolo.png">
+  <link rel="preload" href="fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="inicio">
+<svg class="sprite" aria-hidden="true">
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="wa" viewBox="0 0 24 24"><path d="M4 20l1.2-4A8.5 8.5 0 1 1 8.4 19z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 8.5c0 3.5 2.8 6.5 6.5 6.5l1-1.6-2-1-1 .9a4.6 4.6 0 0 1-2.4-2.4l.9-1-1-2z"/></symbol>
+  <symbol id="printer" viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 17H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-3M7 14h10v7H7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3 6.6-6.6a4 4 0 0 1-5-5L13 5zM3 21l6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="ico-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9.5" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="ig" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.1"/></symbol>
+  <symbol id="camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="truck" viewBox="0 0 24 24"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="7" cy="18" r="2" fill="#fff" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="18" r="2" fill="#fff" stroke="currentColor" stroke-width="2"/></symbol>
+</svg>
+
+<main>
+  <section class="hero">
+    <div class="wrap hero__grid">
+      <div>
+        <p class="tag">Todas as suas soluções de impressão em um só lugar</p>
+        <h1 class="h1">Impressão <span class="hl">sem pausa</span> pro seu trabalho.</h1>
+        <p class="lead">Alugue a impressora certa pelos dias que precisar, ou traga a sua pra gente deixar nova de novo. Tudo resolvido pelo site e pelo WhatsApp.</p>
+        <div class="hero__cta">
+          <a class="btn btn--ink" href="locacao.html"><svg><use href="#printer"/></svg>Alugar impressora</a>
+          <a class="btn" href="manutencao.html"><svg><use href="#wrench"/></svg>Pedir manutenção</a>
+        </div>
+        <div class="hero__meta" id="hero-meta">
+          <span><svg><use href="#ico-cal"/></svg>Escolha as datas no calendário</span>
+          <span><svg><use href="#clock"/></svg><span data-horario>Seg a sex · 08:30 às 18:00</span></span>
+        </div>
+      </div>
+      <div class="press" aria-hidden="true">
+        <div class="press__sticker">a partir de<b data-min-price>R$ /dia</b></div>
+        <div class="press__paper"><i></i><i></i><i></i><i></i><b></b></div>
+        <div class="press__top"></div>
+        <div class="press__body">
+          <div class="press__inks"><i></i><i></i><i></i><i></i></div>
+          <div class="press__panel"><span></span><em></em></div>
+          <div class="press__slot"></div>
+        </div>
+        <div class="press__out"><div><i></i><i></i><i></i><i></i></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="feed" aria-hidden="true"><div class="feed__t"><span>Locação por dia</span><span>Manutenção</span><span>Laser</span><span>Jato de tinta</span><span>Multifuncionais</span><span>Etiquetas</span><span>Atendimento no WhatsApp</span><span>Escritórios e eventos</span><span>Locação por dia</span><span>Manutenção</span><span>Laser</span><span>Jato de tinta</span><span>Multifuncionais</span><span>Etiquetas</span><span>Atendimento no WhatsApp</span><span>Escritórios e eventos</span></div></div>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head rv"><div><p class="tag tag--c">01 · Serviços</p><h2 class="h2">O que a <span class="hl hl--c">Gaúcha</span> faz</h2></div></div>
+      <div class="services">
+        <a class="svc crop rv" href="locacao.html">
+          <span class="svc__ico"><svg><use href="#printer"/></svg></span>
+          <h3>Locação de impressoras</h3>
+          <p>Para escritório, evento, temporada de provas ou aquele pico de demanda. Você paga só pelos dias que usar.</p>
+          <ul><li>Valor por dia, com desconto para períodos longos</li><li>Escolha as datas direto no calendário</li><li>Confirmação pelo WhatsApp</li></ul>
+          <span class="svc__go">Ver impressoras <svg><use href="#arrow"/></svg></span>
+        </a>
+        <a class="svc svc--m crop rv" href="manutencao.html">
+          <span class="svc__ico"><svg><use href="#wrench"/></svg></span>
+          <h3>Manutenção</h3>
+          <p>Papel enroscando, falha na impressão, manchas, erro no painel? Conte o que está acontecendo e mande uma foto.</p>
+          <ul><li>Formulário rápido, sem cadastro</li><li>Vai direto para o WhatsApp da Gaúcha</li><li>Atendimento de segunda a sexta</li></ul>
+          <span class="svc__go">Pedir manutenção <svg><use href="#arrow"/></svg></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="destaques-sec">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div><p class="tag">02 · Para alugar</p><h2 class="h2">Impressoras em <span class="hl hl--m">destaque</span></h2></div>
+        <a class="btn btn--sm" href="locacao.html">Ver todas <svg><use href="#arrow"/></svg></a>
+      </div>
+      <div class="grid" id="destaques"><p class="empty">Carregando…</p></div>
+    </div>
+  </section>
+
+  <section class="block block--ink">
+    <div class="wrap">
+      <div class="sec-head rv"><div><p class="tag tag--y">03 · Como funciona</p><h2 class="h2">Alugar é simples assim</h2></div></div>
+      <div class="steps">
+        <div class="step rv"><h3>Escolha a impressora</h3><p>Veja modelos, recursos e o valor da diária.</p></div>
+        <div class="step rv"><h3>Marque as datas</h3><p>Toque no primeiro e no último dia. O total aparece na hora.</p></div>
+        <div class="step rv"><h3>A Gaúcha confirma</h3><p>As datas ficam reservadas para você enquanto a gente confirma.</p></div>
+        <div class="step rv"><h3>É só imprimir</h3><p>Com tudo aprovado, você recebe o aviso e combina a retirada.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="lcd rv" id="horario">
+        <div class="lcd__screen" id="lcd"></div>
+        <div class="lcd__info">
+          <p class="tag tag--y">04 · Atendimento</p>
+          <h3>Segunda a sexta, das 08:30 às 18:00</h3>
+          <p>Pedidos de locação e manutenção podem ser enviados a qualquer hora pelo site. Fora do horário, respondemos no próximo dia útil.</p>
+          <div class="lcd__btns" id="contato-btns"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="js/config.js"></script>
+<script src="js/vendor/supabase.js"></script>
+<script src="js/demo.js"></script>
+<script src="js/site.js"></script>
+</body>
+</html>

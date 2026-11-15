@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>Locação de impressoras · Gaúcha Impressoras</title>
+  <meta name="description" content="Escolha a impressora, marque as datas no calendário e veja o valor na hora. A Gaúcha confirma pelo WhatsApp.">
+  <meta name="theme-color" content="#f6f3ea">
+  <meta property="og:title" content="Locação de impressoras · Gaúcha Impressoras">
+  <meta property="og:image" content="img/logo.png">
+  <meta property="og:description" content="Escolha a impressora, marque as datas no calendário e veja o valor na hora. A Gaúcha confirma pelo WhatsApp.">
+  <link rel="icon" href="img/logo-simbolo.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="img/logo-simbolo.png">
+  <link rel="preload" href="fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="locacao">
+<svg class="sprite" aria-hidden="true">
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="right" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="wa" viewBox="0 0 24 24"><path d="M4 20l1.2-4A8.5 8.5 0 1 1 8.4 19z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 8.5c0 3.5 2.8 6.5 6.5 6.5l1-1.6-2-1-1 .9a4.6 4.6 0 0 1-2.4-2.4l.9-1-1-2z"/></symbol>
+  <symbol id="printer" viewBox="0 0 24 24"><path d="M7 9V3h10v6M7 17H4a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-3M7 14h10v7H7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0 5 5L21 13l-8 8-3-3 6.6-6.6a4 4 0 0 1-5-5L13 5zM3 21l6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="ico-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="9.5" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 7l9 6 9-6" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="ig" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.1"/></symbol>
+  <symbol id="camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13.5" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="truck" viewBox="0 0 24 24"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="7" cy="18" r="2" fill="#fff" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="18" r="2" fill="#fff" stroke="currentColor" stroke-width="2"/></symbol>
+</svg>
+
+<main>
+  <section class="block">
+    <div class="wrap">
+      <div class="sec-head">
+        <div>
+          <p class="tag tag--c">Locação</p>
+          <h1 class="h2">Escolha a sua <span class="hl hl--c">impressora</span></h1>
+          <p class="text">Valor por dia. Toque em “Ver datas e alugar” para marcar o período no calendário. As datas ficam reservadas até a Gaúcha confirmar.</p>
+        </div>
+      </div>
+      <div class="filters" id="filtros" role="group" aria-label="Filtrar por categoria"></div>
+      <div class="grid" id="catalogo"><p class="empty">Carregando…</p></div>
+    </div>
+  </section>
+  <div class="feed" aria-hidden="true"><div class="feed__t"><span>Locação por dia</span><span>Manutenção</span><span>Laser</span><span>Jato de tinta</span><span>Multifuncionais</span><span>Etiquetas</span><span>Atendimento no WhatsApp</span><span>Escritórios e eventos</span><span>Locação por dia</span><span>Manutenção</span><span>Laser</span><span>Jato de tinta</span><span>Multifuncionais</span><span>Etiquetas</span><span>Atendimento no WhatsApp</span><span>Escritórios e eventos</span></div></div>
+</main>
+
+<dialog class="sheet" id="aluguel" aria-labelledby="al-nome">
+  <div class="sheet__box">
+    <header class="sheet__head">
+      <div class="sheet__thumb" id="al-thumb"></div>
+      <div class="sheet__title"><small id="al-marca"></small><b id="al-nome"></b></div>
+      <button class="x" type="button" id="al-x" aria-label="Fechar">×</button>
+    </header>
+    <div class="sheet__body" id="al-body">
+      <div>
+        <p class="step-l">1 · Marque o primeiro e o último dia</p>
+        <div class="cal" id="cal"></div>
+        <div class="legend"><span><i class="l-free"></i>Livre</span><span><i class="l-pend"></i>Aguardando confirmação</span><span><i class="l-busy"></i>Reservado</span><span><i class="l-sel"></i>Sua escolha</span></div>
+        <p class="cal__hint" id="cal-hint"></p>
+      </div>
+      <div class="form">
+        <div class="receipt" id="recibo"></div>
+        <form class="form" id="al-form" novalidate>
+          <p class="step-l">2 · Seus dados</p>
+          <label class="field"><span>Nome</span><input name="nome" autocomplete="name" maxlength="80" required></label>
+          <div class="row2">
+            <label class="field"><span>WhatsApp</span><input name="telefone" type="tel" inputmode="tel" autocomplete="tel" placeholder="(53) 99999-9999" maxlength="20" required></label>
+            <label class="field"><span>E-mail <em>(opcional)</em></span><input name="email" type="email" autocomplete="email" maxlength="120"></label>
+          </div>
+          <label class="field"><span>Empresa <em>(opcional)</em></span><input name="empresa" autocomplete="organization" maxlength="80"></label>
+          <label class="field"><span>Observação <em>(opcional)</em></span><textarea name="observacao" maxlength="500" placeholder="Ex.: preciso de entrega, volume de impressão, cabo USB…"></textarea></label>
+          <p class="form__err" id="al-err" role="alert"></p>
+          <button class="btn btn--ink btn--block" type="submit" id="al-enviar">Solicitar locação <svg><use href="#arrow"/></svg></button>
+          <p class="fine">Nada é cobrado agora. A Gaúcha confirma a disponibilidade e avisa você pelo WhatsApp ou e-mail.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="js/config.js"></script>
+<script src="js/vendor/supabase.js"></script>
+<script src="js/demo.js"></script>
+<script src="js/site.js"></script>
+</body>
+</html>

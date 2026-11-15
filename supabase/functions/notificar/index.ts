@@ -1,0 +1,53 @@
+// =====================================================================
+//  OPCIONAL · Aviso automático por e-mail (Supabase Edge Function + Resend)
+//  Disparada por um Database Webhook nas tabelas "reservas" e "chamados":
+//   - novo pedido de locação  -> e-mail para o dono
+//   - pedido aprovado/recusado/cancelado -> e-mail para o cliente (se informou)
+//   - novo chamado de manutenção -> e-mail para o dono
+//  Variáveis (Edge Functions > Secrets): RESEND_API_KEY, EMAIL_DONO,
+//  EMAIL_REMETENTE (ex.: "Gaúcha Impressoras <avisos@seudominio.com.br>"),
+//  WEBHOOK_SECRET (o mesmo valor colocado no cabeçalho x-webhook-secret do webhook).
+//  Veja o passo a passo em SETUP.md.
+// =====================================================================
+const env = (k: string) => Deno.env.get(k) ?? "";
+const brl = (n: number) => Number(n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+const br = (s: string) => s.split("-").reverse().join("/");
+const esc = (s: unknown) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+
+async function enviar(to: string, subject: string, linhas: string[]) {
+  const html = `<div style="font-family:Arial,sans-serif;font-size:15px;line-height:1.6;color:#15171b">
+    <h2 style="color:#169b5b;margin:0 0 12px">Gaúcha Impressoras</h2>${linhas.map((l) => `<p style="margin:0 0 6px">${esc(l)}</p>`).join("")}</div>`;
+  const r = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${env("RESEND_API_KEY")}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ from: env("EMAIL_REMETENTE") || "Gaúcha Impressoras <onboarding@resend.dev>", to: [to], subject, html, text: linhas.join("\n") }),
+  });
+  if (!r.ok) console.error("Resend", r.status, await r.text());
+}
+
+Deno.serve(async (req) => {
+  if (!env("WEBHOOK_SECRET") || req.headers.get("x-webhook-secret") !== env("WEBHOOK_SECRET")) return new Response("forbidden", { status: 403 });
+  const { type, table, record: r, old_record: o } = await req.json();
+  const dono = env("EMAIL_DONO");
+  const periodo = r?.inicio ? `${br(r.inicio)} a ${br(r.fim)} (${r.dias} ${r.dias === 1 ? "dia" : "dias"})` : "";
+
+  if (table === "reservas" && type === "INSERT" && dono) {
+    await enviar(dono, `Novo pedido de locação · ${r.codigo}`, [
+      `Pedido ${r.codigo} aguardando sua aprovação no painel.`, `Impressora: ${r.impressora_nome}`, `Período: ${periodo}`,
+      `Valor estimado: ${brl(r.valor_estimado)}`, `Cliente: ${r.nome}${r.empresa ? " · " + r.empresa : ""}`, `WhatsApp: ${r.telefone}`,
+      r.email ? `E-mail: ${r.email}` : "", r.observacao ? `Obs.: ${r.observacao}` : "",
+    ].filter(Boolean));
+  }
+  if (table === "reservas" && type === "UPDATE" && r.status !== o?.status && r.email && ["aprovada", "recusada", "cancelada"].includes(r.status)) {
+    const t = { aprovada: "Sua locação foi confirmada ✅", recusada: "Não conseguimos confirmar seu pedido", cancelada: "Sua locação foi cancelada" }[r.status as string]!;
+    await enviar(r.email, `${t} · ${r.codigo}`, [
+      `Olá, ${String(r.nome).split(" ")[0]}!`, t + ".", `Pedido: ${r.codigo}`, `Impressora: ${r.impressora_nome}`, `Período: ${periodo}`,
+      r.status === "aprovada" ? `Valor: ${brl(r.valor_final ?? r.valor_estimado)}` : "", r.resposta ? r.resposta : "",
+      "Qualquer dúvida, fale com a gente pelo WhatsApp (53) 99202-3930.",
+    ].filter(Boolean));
+  }
+  if (table === "chamados" && type === "INSERT" && dono) {
+    await enviar(dono, `Novo chamado de manutenção · ${r.codigo}`, [`Modelo: ${r.modelo}`, `Cliente: ${r.nome} · WhatsApp ${r.telefone}`, `Problema: ${r.descricao}`]);
+  }
+  return new Response("ok");
+});
